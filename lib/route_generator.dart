@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app_routes.dart';
-import 'package:flutter_application_1/screens/home.dart';
-import 'package:flutter_application_1/screens/users.dart';
+import 'package:flutter_application_1/screens/home.dart' show HomePage;
+import 'package:flutter_application_1/screens/users.dart' show UsersPage;
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
