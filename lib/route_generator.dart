@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_1/app_routes.dart';
 import 'package:flutter_application_1/screens/home.dart';
 import 'package:flutter_application_1/screens/users.dart';
@@ -16,14 +15,14 @@ class RouteGenerator {
     }
   }
 
-  static MaterialPageRoute buildRoute(Widget child,
+  static CustomPageRoute buildRoute(Widget child,
       {required RouteSettings settings}) {
-    return MaterialPageRoute(
+    return CustomPageRoute(
         settings: settings, builder: (BuildContext context) => child);
   }
 
   static Route<dynamic> _errorRoute() {
-    return MaterialPageRoute(builder: (_) {
+    return CustomPageRoute(builder: (_) {
       return Scaffold(
         appBar: AppBar(
           // backgroundColor: kBlue,
@@ -58,5 +57,16 @@ class RouteGenerator {
         ),
       );
     });
+  }
+}
+
+class CustomPageRoute<T> extends MaterialPageRoute<T> {
+  CustomPageRoute({required WidgetBuilder builder, RouteSettings? settings})
+      : super(builder: builder, settings: settings);
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    return child;
   }
 }
