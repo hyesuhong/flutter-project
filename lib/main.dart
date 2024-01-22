@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app_routes.dart';
 import 'package:flutter_application_1/route_generator.dart';
 
-import 'screens/home.dart';
-import 'screens/users.dart';
-
 void main() {
   runApp(const MyApp());
 }

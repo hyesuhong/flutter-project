@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/bottom_navigation.dart';
 import 'package:flutter_application_1/components/flutter_dialog.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,36 +27,39 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-            child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          '$_counter',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 20, bottom: 40),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: _decrementCounter,
-                child: const Icon(Icons.remove),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 20, bottom: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: _decrementCounter,
+                    child: const Icon(Icons.remove),
+                  ),
+                  ElevatedButton(
+                    onPressed: _incrementCounter,
+                    child: const Icon(Icons.add),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: _incrementCounter,
-                child: const Icon(Icons.add),
-              ),
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: () => flutterDialog(
+                  context, 'Hello dialog', 'Hello world', 'Hello'),
+              child: const Text('Say Hello'),
+            ),
+          ],
         ),
-        TextButton(
-          onPressed: () =>
-              flutterDialog(context, 'Hello dialog', 'Hello world', 'Hello'),
-          child: const Text('Say Hello'),
-        ),
-      ],
-    )));
+      ),
+      bottomNavigationBar: BottomNavigation(index: 0),
+    );
   }
 }

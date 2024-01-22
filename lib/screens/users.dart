@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '/components/bottom_navigation.dart';
 import 'package:http/http.dart' as http;
 
 class UsersPage extends StatefulWidget {
@@ -56,6 +57,7 @@ class _UsersPageState extends State<UsersPage> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigation(index: 1),
     );
   }
 }
