@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class UsersPage extends StatefulWidget {
-  const UsersPage({super.key, required this.title});
-
-  final String title;
+  const UsersPage({super.key});
 
   @override
   State<UsersPage> createState() => _UsersPageState();
