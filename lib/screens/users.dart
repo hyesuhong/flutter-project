@@ -31,30 +31,36 @@ class _UsersPageState extends State<UsersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () => _fetchUsers(),
-              child: Text('Get Users'),
-            ),
-            FutureBuilder(
-              future: _users,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasData) {
-                  var users = snapshot.data!;
-                  return buildUsers(users);
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
+      body: Align(
+        alignment: _users != null ? Alignment.topCenter : Alignment.center,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(top: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => _fetchUsers(),
+                  child: Text('Get Users'),
+                ),
+                FutureBuilder(
+                  future: _users,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData) {
+                      var users = snapshot.data!;
+                      return buildUsers(users);
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
 
-                return Text('There are no user data');
-              },
-            )
-          ],
+                    return Text('There are no user data');
+                  },
+                )
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigation(index: 1),
@@ -97,13 +103,15 @@ Future<List<User>> fetchFakeUsers() async {
 }
 
 Widget buildUsers(List<User> users) {
-  return ListView.builder(
-    // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-    itemCount: users.length,
+  return GridView.count(
+    physics: const NeverScrollableScrollPhysics(),
     shrinkWrap: true,
-    itemBuilder: (context, index) {
-      final user = users[index];
-      return Text(user.name);
-    },
+    crossAxisCount: 2,
+    children: List.generate(
+      users.length,
+      (index) => Center(
+        child: Text(users[index].name),
+      ),
+    ),
   );
 }
