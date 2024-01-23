@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/widgets/button.dart' show Button;
 
 void main() {
   runApp(const MyApp());
@@ -70,42 +71,14 @@ class MyApp extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xfff2b33a),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 56,
-                        vertical: 16,
-                      ),
-                      child: Text(
-                        'Transfer',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
+                  Button(
+                    label: 'Transfer',
+                    backgroundColor: const Color(0xfff2b33a),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xff1f2123),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 56,
-                        vertical: 16,
-                      ),
-                      child: Text(
-                        'Request',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  Button(
+                    label: 'Request',
+                    backgroundColor: const Color(0xff1f2123),
+                    textColor: Colors.white,
                   ),
                 ],
               ),
