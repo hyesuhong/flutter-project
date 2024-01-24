@@ -16,8 +16,9 @@ class Currency {
 
 class CurrencyCard extends StatelessWidget {
   final Currency currencyData;
+  final int index;
 
-  final bool isInverted;
+  bool get isInverted => index.isOdd;
 
   final _darkColor = const Color(0xff1f2123);
   final _lightColor = Colors.white;
@@ -25,7 +26,7 @@ class CurrencyCard extends StatelessWidget {
   CurrencyCard({
     super.key,
     required this.currencyData,
-    required this.isInverted,
+    required this.index,
   });
 
   @override
@@ -34,77 +35,83 @@ class CurrencyCard extends StatelessWidget {
     var textColor = isInverted ? _darkColor : _lightColor;
 
     final formatCurrency = NumberFormat.simpleCurrency(
-        locale: 'ko_KR', name: '', decimalDigits: 0);
+      locale: 'ko_KR',
+      name: '',
+      decimalDigits: 0,
+    );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-          topRight: Radius.elliptical(60, 40),
-          bottomLeft: Radius.elliptical(60, 40),
+    return Transform.translate(
+      offset: Offset(0, (-15 * index).toDouble()),
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+            topRight: Radius.elliptical(60, 40),
+            bottomLeft: Radius.elliptical(60, 40),
+          ),
         ),
-      ),
-      padding: EdgeInsets.only(
-        top: 24,
-        bottom: 32,
-        left: 16,
-        right: 16,
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                currencyData.currency,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
+        padding: EdgeInsets.only(
+          top: 24,
+          bottom: 32,
+          left: 16,
+          right: 16,
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  currencyData.currency,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Row(
-                children: [
-                  Text(
-                    formatCurrency.format(currencyData.amount),
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 16,
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      formatCurrency.format(currencyData.amount),
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    currencyData.unit,
-                    style: TextStyle(
-                      color: textColor.withOpacity(0.7),
-                      fontSize: 12,
+                    SizedBox(
+                      width: 8,
                     ),
-                  ),
-                ],
-              )
-            ],
-          ),
-          Transform(
-            transform: Matrix4.identity()
-              ..translate(-5.0, 40.0)
-              ..scale(2.5, 2.5, 2.5),
-            alignment: Alignment.center,
-            child: Icon(
-              currencyData.icon,
-              color: textColor,
-              size: 80,
+                    Text(
+                      currencyData.unit,
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
-          ),
-        ],
+            Transform(
+              transform: Matrix4.identity()
+                ..translate(-5.0, 40.0)
+                ..scale(2.5, 2.5, 2.5),
+              alignment: Alignment.center,
+              child: Icon(
+                currencyData.icon,
+                color: textColor,
+                size: 80,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: const Color(0xff181818),
-        body: Padding(
+        body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: 16,
           ),
@@ -135,8 +135,9 @@ class MyApp extends StatelessWidget {
               ...List.generate(
                 dummyCurrency.length,
                 (index) => CurrencyCard(
-                    currencyData: dummyCurrency[index],
-                    isInverted: index.isOdd),
+                  currencyData: dummyCurrency[index],
+                  index: index,
+                ),
               )
             ],
           ),
