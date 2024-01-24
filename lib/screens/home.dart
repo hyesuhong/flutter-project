@@ -1,65 +1,79 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/components/bottom_navigation.dart';
-import 'package:flutter_application_1/components/flutter_dialog.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Home> createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
-
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 20, bottom: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: _decrementCounter,
-                    child: const Icon(Icons.remove),
-                  ),
-                  ElevatedButton(
-                    onPressed: _incrementCounter,
-                    child: const Icon(Icons.add),
-                  ),
-                ],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          Flexible(
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                '25:00',
+                style: TextStyle(
+                    color: Theme.of(context).cardColor,
+                    fontSize: 88,
+                    fontWeight: FontWeight.w700),
               ),
             ),
-            TextButton(
-              onPressed: () => flutterDialog(
-                  context, 'Hello dialog', 'Hello world', 'Hello'),
-              child: const Text('Say Hello'),
+          ),
+          Flexible(
+            flex: 2,
+            child: Center(
+              child: IconButton(
+                iconSize: 112,
+                color: Theme.of(context).cardColor,
+                icon: Icon(Icons.play_circle_outline),
+                onPressed: () {},
+              ),
             ),
-          ],
-        ),
+          ),
+          Flexible(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Pomodoros',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                          ),
+                        ),
+                        Text(
+                          '0',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                Theme.of(context).textTheme.displayLarge?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomNavigation(index: 0),
     );
   }
 }

@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app_routes.dart';
-import 'package:flutter_application_1/route_generator.dart';
+import 'package:flutter_application_1/screens/home.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  String getInitialPage() => AppRoutes.home;
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSwatch(
+          backgroundColor: const Color(0xFFE7626C),
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            color: Color(0xFF232B55),
+          ),
+        ),
+        cardColor: const Color(0xFFF4EDDB),
       ),
-      initialRoute: getInitialPage(),
-      onGenerateRoute: RouteGenerator.generateRoute,
+      home: Home(),
     );
   }
 }
