@@ -16,6 +16,8 @@ class _HomeState extends State<Home> {
   bool isRunning = false;
   int totalPomodoros = 0;
 
+  bool resettable = false;
+
   late Timer timer;
 
   void onTick(Timer timer) {
@@ -43,6 +45,7 @@ class _HomeState extends State<Home> {
 
     setState(() {
       isRunning = true;
+      resettable = true;
     });
   }
 
@@ -54,9 +57,19 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void onRefreshPressed() {
+    timer.cancel();
+    setState(() {
+      totalPomodoros = 0;
+      isRunning = false;
+      totalSeconds = timerSeconds;
+      resettable = false;
+    });
+  }
+
   String format(int seconds) {
     var duration = Duration(seconds: seconds);
-    return duration.toString().split('.')[0].substring(2);
+    return duration.toString().split('.').first.substring(2);
   }
 
   @override
@@ -80,14 +93,48 @@ class _HomeState extends State<Home> {
           Flexible(
             flex: 2,
             child: Center(
-              child: IconButton(
-                iconSize: 112,
-                color: Theme.of(context).cardColor,
-                icon: isRunning
-                    ? Icon(Icons.pause_circle_outline)
-                    : Icon(Icons.play_circle_outline),
-                onPressed: () =>
-                    isRunning ? onPausePressed() : onStartPressed(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    iconSize: 112,
+                    color: Theme.of(context).cardColor,
+                    icon: isRunning
+                        ? Icon(Icons.pause_circle_outline)
+                        : Icon(Icons.play_circle_outline),
+                    onPressed: () =>
+                        isRunning ? onPausePressed() : onStartPressed(),
+                  ),
+                  AnimatedPadding(
+                    padding: resettable
+                        ? EdgeInsets.only(
+                            bottom: 32,
+                          )
+                        : EdgeInsets.zero,
+                    duration: Duration(
+                      milliseconds: 300,
+                    ),
+                    curve: Curves.linear,
+                  ),
+                  AnimatedSwitcher(
+                    duration: Duration(
+                      milliseconds: 300,
+                    ),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    switchInCurve: Curves.linear,
+                    switchOutCurve: Curves.linear,
+                    child: resettable
+                        ? IconButton(
+                            icon: Icon(Icons.refresh),
+                            iconSize: 32,
+                            color: Theme.of(context).cardColor,
+                            onPressed: () => onRefreshPressed(),
+                          )
+                        : SizedBox.shrink(),
+                  )
+                ],
               ),
             ),
           ),
