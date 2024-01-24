@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -8,6 +10,25 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int totalSeconds = 1500;
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    print(timer);
+    setState(() {
+      totalSeconds--;
+    });
+  }
+
+  void onStartPressed() {
+    timer = Timer.periodic(
+      Duration(
+        seconds: 1,
+      ),
+      onTick,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +39,7 @@ class _HomeState extends State<Home> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                '25:00',
+                totalSeconds.toString(),
                 style: TextStyle(
                     color: Theme.of(context).cardColor,
                     fontSize: 88,
@@ -33,7 +54,7 @@ class _HomeState extends State<Home> {
                 iconSize: 112,
                 color: Theme.of(context).cardColor,
                 icon: Icon(Icons.play_circle_outline),
-                onPressed: () {},
+                onPressed: () => onStartPressed(),
               ),
             ),
           ),
@@ -44,6 +65,9 @@ class _HomeState extends State<Home> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(50),
+                      ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
