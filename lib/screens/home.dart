@@ -11,6 +11,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int totalSeconds = 1500;
+  bool isRunning = false;
   late Timer timer;
 
   void onTick(Timer timer) {
@@ -27,6 +28,18 @@ class _HomeState extends State<Home> {
       ),
       onTick,
     );
+
+    setState(() {
+      isRunning = true;
+    });
+  }
+
+  void onPausePressed() {
+    timer.cancel();
+
+    setState(() {
+      isRunning = false;
+    });
   }
 
   @override
@@ -53,8 +66,11 @@ class _HomeState extends State<Home> {
               child: IconButton(
                 iconSize: 112,
                 color: Theme.of(context).cardColor,
-                icon: Icon(Icons.play_circle_outline),
-                onPressed: () => onStartPressed(),
+                icon: isRunning
+                    ? Icon(Icons.pause_circle_outline)
+                    : Icon(Icons.play_circle_outline),
+                onPressed: () =>
+                    isRunning ? onPausePressed() : onStartPressed(),
               ),
             ),
           ),
