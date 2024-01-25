@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/styles/font.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.black12,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.grey[600],
+        elevation: 5,
+        title: Text(
+          'Today\'s toons',
+          style: TextStyle(
+            fontSize: 20,
+            fontVariations: [NotoSansKRWeight.w500],
+          ),
+        ),
+      ),
+    );
   }
 }
