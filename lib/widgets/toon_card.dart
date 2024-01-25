@@ -31,6 +31,7 @@ class ToonCard extends StatelessWidget {
       child: Column(
         children: [
           Thumbnail(
+            id: toon.id,
             thumbUrl: toon.thumb,
           ),
           SizedBox(

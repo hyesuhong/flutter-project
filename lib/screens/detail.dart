@@ -26,6 +26,7 @@ class DetailScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Thumbnail(
+                id: id,
                 thumbUrl: thumb,
               ),
             ],
