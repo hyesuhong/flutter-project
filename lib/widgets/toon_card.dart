@@ -18,6 +18,7 @@ class ToonCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
+            fullscreenDialog: true,
             builder: (context) => DetailScreen(
               id: toon.id,
               title: toon.title,
@@ -29,7 +30,9 @@ class ToonCard extends StatelessWidget {
       },
       child: Column(
         children: [
-          Thumbnail(thumbUrl: toon.thumb),
+          Thumbnail(
+            thumbUrl: toon.thumb,
+          ),
           SizedBox(
             height: 16,
           ),
