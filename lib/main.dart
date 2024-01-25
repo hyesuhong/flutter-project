@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app_routes.dart';
-import 'package:flutter_application_1/route_generator.dart';
+import 'package:flutter_application_1/screens/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,8 +7,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  String getInitialPage() => AppRoutes.home;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +16,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      initialRoute: getInitialPage(),
-      onGenerateRoute: RouteGenerator.generateRoute,
+      home: Home(),
     );
   }
 }
