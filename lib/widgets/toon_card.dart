@@ -26,7 +26,6 @@ class ToonCard extends StatelessWidget {
             ),
           ),
         );
-        print(toon.title);
       },
       child: Column(
         children: [
