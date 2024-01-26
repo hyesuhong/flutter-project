@@ -48,7 +48,7 @@ class ApiService {
       throw Error();
     }
 
-    final dynamic eps = jsonDecode(response.body);
+    final List<dynamic> eps = jsonDecode(response.body);
     var episodesData = eps.map((e) => ToonEpisodeModel.fromJson(e)).toList();
 
     return episodesData;
