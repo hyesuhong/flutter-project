@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/toon_model.dart';
-import 'package:flutter_application_1/screens/detail.dart';
+import 'package:flutter_application_1/screens/detail_screen.dart';
 import 'package:flutter_application_1/styles/font.dart';
 import 'package:flutter_application_1/widgets/thumbnail.dart';
 

@@ -4,8 +4,8 @@ import 'package:flutter_application_1/services/api_service.dart';
 import 'package:flutter_application_1/widgets/header_bar.dart';
 import 'package:flutter_application_1/widgets/toon_card.dart';
 
-class Home extends StatelessWidget {
-  Home({super.key});
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
   final Future<List<ToonModel>> toons = ApiService.getTodayToons();
 
