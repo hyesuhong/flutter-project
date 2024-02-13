@@ -6,6 +6,7 @@ import 'package:flutter_application_1/styles/font.dart';
 import 'package:flutter_application_1/widgets/episode_item.dart';
 import 'package:flutter_application_1/widgets/header_bar.dart';
 import 'package:flutter_application_1/widgets/thumbnail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailScreen extends StatefulWidget {
   final String id, title, thumb;
@@ -24,12 +25,54 @@ class _DetailScreenState extends State<DetailScreen> {
   late Future<ToonDetailModel> toon;
   late Future<List<ToonEpisodeModel>> episodes;
 
+  late SharedPreferences prefs;
+  bool isLiked = false;
+
+  String _prefsKey = 'likedToons';
+
+  Future _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    final likedToons = prefs.getStringList(_prefsKey);
+
+    if (likedToons == null) {
+      await prefs.setStringList(_prefsKey, []);
+    } else {
+      if (likedToons.contains(widget.id)) {
+        setState(() {
+          isLiked = true;
+        });
+      }
+    }
+  }
+
+  onHeartTap() async {
+    final likedToons = prefs.getStringList(_prefsKey);
+    if (likedToons == null) {
+      return;
+    } else {
+      if (isLiked) {
+        likedToons.remove(widget.id);
+      } else {
+        likedToons.add(widget.id);
+      }
+
+      await prefs.setStringList(_prefsKey, likedToons);
+
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     toon = ApiService.getToonById(widget.id);
     episodes = ApiService.getLatestEpisodesById(widget.id);
+
+    _initPrefs();
   }
 
   @override
@@ -37,6 +80,17 @@ class _DetailScreenState extends State<DetailScreen> {
     return Scaffold(
       appBar: HeaderBar(
         title: widget.title,
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: isLiked
+                ? Icon(
+                    Icons.favorite,
+                    color: Colors.red[300],
+                  )
+                : Icon(Icons.favorite_outline),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 24),
