@@ -127,7 +127,7 @@ class _DetailScreenState extends State<DetailScreen> {
               future: episodes,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return buildEpisodesList(snapshot.data!);
+                  return buildEpisodesList(snapshot.data!, widget.id);
                   // return Column(
                   //   children: [
                   //     for (var episode in snapshot.data!)
@@ -174,13 +174,16 @@ List<TextSpan> buildGenresWidget(List<String> genres) {
   return genreText;
 }
 
-Widget buildEpisodesList(List<ToonEpisodeModel> episodes) {
+Widget buildEpisodesList(List<ToonEpisodeModel> episodes, String toonId) {
   return ListView.separated(
     shrinkWrap: true,
     physics: NeverScrollableScrollPhysics(),
     itemCount: episodes.length,
     itemBuilder: (context, index) {
-      return EpisodeItem(episode: episodes[index]);
+      return EpisodeItem(
+        episode: episodes[index],
+        toonId: toonId,
+      );
     },
     separatorBuilder: (context, index) {
       return SizedBox(height: 10);
