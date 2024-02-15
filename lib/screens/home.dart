@@ -10,7 +10,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  static const timerSeconds = 60;
+  static const timerSeconds = 10;
 
   int totalSeconds = timerSeconds;
   bool isRunning = false;
