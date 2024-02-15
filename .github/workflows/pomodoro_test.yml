@@ -24,8 +24,14 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Check Flutter's version
-        run: flutter --version
+      - name: Install pubs
+        run: flutter pub get
+      
+      - name: Build web application
+        run: |
+          flutter build web
+          echo '--------'
+          ls
 
   connect:
     runs-on: ubuntu-latest
