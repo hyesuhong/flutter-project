@@ -1,35 +1,52 @@
-name: Check contexts
+name: AWS EC2 connection test
 
 on:
   push:
     branches: [ pomodoro_app ]
 
 jobs:
-  test:
+  connect:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Dump GitHub context
+      - name: Get public ip4
+        id: ip4
+        run: |
+          ip=$(curl -s https://api.ipify.org)
+          echo "ip4=${ip}" >> "$GITHUB_OUTPUT"
+      
+      - name: Create SSH key
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
+          SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          echo "$SSH_KEY" >> $HOME/github_action.pem
+          chmod 400 $HOME/github_action.pem
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Add Github Actions IP to Security group
+        env: 
+          IP: ${{ steps.ip4.outputs.ip4 }}
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+
+      - name: Connect to EC2 by SSH
         env:
-          JOB_CONTEXT: ${{ toJson(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump steps context
+          SSH_USER: ${{ secrets.AWS_EC2_USER }}
+          SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
+        run: |
+          ssh -i $HOME/github_action.pem -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
+            whoami
+          '
+
+      - name: Remove Github Actions IP From Security Group
+        if: always()
         env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+          IP: ${{ steps.ip4.outputs.ip4 }}
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
