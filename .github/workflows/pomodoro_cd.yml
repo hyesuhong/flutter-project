@@ -1,4 +1,6 @@
 name: AWS EC2 connection test
+env:
+  ARTIFACT_NAME: build_artifact
 
 on:
   push:
@@ -29,26 +31,25 @@ jobs:
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
           pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:"
 
-      - name: Check pubs cache
-        run: |
-          echo PUB-CACHE-KEY=${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}
-          echo "is null? : ${{ steps.flutter-action.outputs.PUB-CACHE-KEY == null }}"
-          echo "is empty string? : ${{ steps.flutter-action.outputs.PUB-CACHE-KEY == '' }}"
-
-      # - if: ${{ (steps.flutter-action.outputs.PUB-CACHE-KEY != null) || (steps.flutter-action.outputs.PUB-CACHE-KEY != '') }}
-      #   name: Install flutter pubs
-      #   run: flutter pub get
-
       - name: Build web application
         run: flutter build web
 
-      - name: Check build files
-        run: |
-          ls -lR build
+      - name: Tar build files
+        run: tar cvf build.tar build/web
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: build.tar
+          retention-days: 1
 
   connect:
     runs-on: ubuntu-latest
     needs: [build]
+    env:
+      KEY_FILE: github_action.pem
+      DIRECTORY_NAME: pomodoro
 
     steps:
       - name: Get public ip4
@@ -61,34 +62,65 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
         run: |
-          echo "$SSH_KEY" >> $HOME/github_action.pem
-          chmod 400 $HOME/github_action.pem
+          echo "$SSH_KEY" >> $HOME/${{ env.KEY_FILE }}
+          chmod 400 $HOME/${{ env.KEY_FILE }}
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Get build artifact
+        uses: actions/download-artifact@v4
+        id: get_artifact
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          name: ${{ env.ARTIFACT_NAME }}
+          path: tmp
 
-      - name: Add Github Actions IP to Security group
-        env:
-          IP: ${{ steps.ip4.outputs.ip4 }}
+      - name: Display downloaded files
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+          echo ${{ steps.get_artifact.outputs.download-path }}
 
-      - name: Connect to EC2 by SSH
-        env:
-          SSH_USER: ${{ secrets.AWS_EC2_USER }}
-          SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
-        run: |
-          ssh -i $HOME/github_action.pem -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
-            whoami
-          '
+          pwd
 
-      - name: Remove Github Actions IP From Security Group
-        if: always()
-        env:
-          IP: ${{ steps.ip4.outputs.ip4 }}
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+          tar tf tmp/build.tar
+
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+      #     aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      # - name: Add Github Actions IP to Security group
+      #   env:
+      #     IP: ${{ steps.ip4.outputs.ip4 }}
+      #   run: |
+      #     aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+
+      # - name: Upload build files to EC2
+      #   env:
+      #     SSH_USER: ${{ secrets.AWS_EC2_USER }}
+      #     SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
+      #   run: scp -i $HOME/${{ env.KEY_FILE }} -o StrictHostKeyChecking=no tmp/build.tar ${SSH_USER}@${SSH_HOSTNAME}:/var/www
+
+      # - name: Connect to EC2 by SSH
+      #   env:
+      #     SSH_USER: ${{ secrets.AWS_EC2_USER }}
+      #     SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
+      #   run: |
+      #     ssh -i $HOME/github_action.pem -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
+      #       cd /var/www
+
+      #       if [ ! -d ${{env.DIRECTORY_NAME}} ]; then
+      #         mkdir ${{env.DIRECTORY_NAME}}
+      #       fi
+
+      #       tar xvf build.tar -C ${{ env.DIRECTORY_NAME }} --strip-component=1
+
+      #       ls ${{ env.DIRECTORY_NAME }}
+
+      #       rm build.tar
+      #     '
+
+      # - name: Remove Github Actions IP From Security Group
+      #   if: always()
+      #   env:
+      #     IP: ${{ steps.ip4.outputs.ip4 }}
+      #   run: |
+      #     aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
