@@ -20,13 +20,14 @@ jobs:
 
       - name: Setup Flutter
         id: flutter-action
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@main
         with:
           flutter-version: "3.x"
           channel: "stable"
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:"
 
       - name: Check flutter's cache
         run: |
@@ -35,9 +36,11 @@ jobs:
           echo CHANNEL=${{ steps.flutter-action.outputs.CHANNEL }}
           echo VERSION=${{ steps.flutter-action.outputs.VERSION }}
           echo ARCHITECTURE=${{ steps.flutter-action.outputs.ARCHITECTURE }}
+          echo PUB-CACHE-PATH=${{ steps.flutter-action.outputs.PUB-CACHE-PATH }}
+          echo PUB-CACHE-KEY=${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}
 
-      - name: Install pubs
-        run: flutter pub get
+      # - name: Install pubs
+      #   run: flutter pub get
 
       - name: Build web application
         run: flutter build web
