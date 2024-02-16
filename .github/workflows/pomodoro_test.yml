@@ -2,7 +2,7 @@ name: AWS EC2 connection test
 
 on:
   push:
-    branches: [ pomodoro_app ]
+    branches: [pomodoro_app]
 
 jobs:
   build:
@@ -11,22 +11,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Java JDK
         uses: actions/setup-java@v4.0.0
         with:
           distribution: zulu
           java-version: 17
-  
+          cache: "gradle"
+
       - name: Setup Flutter LTS
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: "3.x"
+          channel: "stable"
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+          pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:"
+          pub-cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+
+      - name: Check Flutter cache
+        run: |
+          echo CACHE-PATH=${{ steps.flutter-action.outputs.CACHE-PATH }}
+          echo CACHE-KEY=${{ steps.flutter-action.outputs.CACHE-KEY }}
+          echo CHANNEL=${{ steps.flutter-action.outputs.CHANNEL }}
+          echo VERSION=${{ steps.flutter-action.outputs.VERSION }}
+          echo ARCHITECTURE=${{ steps.flutter-action.outputs.ARCHITECTURE }}
+          echo PUB-CACHE-PATH=${{ steps.flutter-action.outputs.PUB-CACHE-PATH }}
+          echo PUB-CACHE-KEY=${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}
 
       - name: Install pubs
         run: flutter pub get
-      
+
       - name: Build web application
         run: flutter build web
 
@@ -36,31 +52,31 @@ jobs:
 
   connect:
     runs-on: ubuntu-latest
-    needs: [ build ]
-    
+    needs: [build]
+
     steps:
       - name: Get public ip4
         id: ip4
         run: |
           ip=$(curl -s https://api.ipify.org)
           echo "ip4=${ip}" >> "$GITHUB_OUTPUT"
-      
+
       - name: Create SSH key
         env:
           SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
         run: |
           echo "$SSH_KEY" >> $HOME/github_action.pem
           chmod 400 $HOME/github_action.pem
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      
+
       - name: Add Github Actions IP to Security group
-        env: 
+        env:
           IP: ${{ steps.ip4.outputs.ip4 }}
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
