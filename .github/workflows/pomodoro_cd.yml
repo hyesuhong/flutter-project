@@ -110,7 +110,7 @@ jobs:
               mkdir ${{ env.BUILD_DIR }}
             fi
 
-            tar xf ${{ env.ARTIFACT_FILE_PATH }} -C ${{ env.BUILD_DIR }} --strip-component=1
+            tar xf ${{ env.ARTIFACT_FILE_PATH }} -C ${{ env.BUILD_DIR }} --strip-component=2
 
             ls ${{ env.BUILD_DIR }}
 
