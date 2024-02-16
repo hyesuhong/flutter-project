@@ -1,6 +1,7 @@
 name: AWS EC2 connection test
 env:
   ARTIFACT_NAME: build_artifact
+  ARTIFACT_FILE_PATH: build.tar
 
 on:
   push:
@@ -41,15 +42,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: build.tar
+          path: ${{ env.ARTIFACT_FILE_PATH }}
           retention-days: 1
 
-  connect:
+  deploy:
     runs-on: ubuntu-latest
     needs: [build]
     env:
       KEY_FILE: github_action.pem
-      DIRECTORY_NAME: pomodoro
+      TARGET_DIR: /var/www
+      BUILD_DIR: pomodoro
+      TMP_DIR: tmp
 
     steps:
       - name: Get public ip4
@@ -70,7 +73,7 @@ jobs:
         id: get_artifact
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: tmp
+          path: ${{ env.TMP_DIR }}
 
       - name: Display downloaded files
         run: |
@@ -78,7 +81,7 @@ jobs:
 
           pwd
 
-          tar tf tmp/build.tar
+          tar tf ${{ steps.get_artifact.outputs.download-path }}
 
       # - name: Configure AWS credentials
       #   uses: aws-actions/configure-aws-credentials@v4
@@ -107,13 +110,13 @@ jobs:
       #     ssh -i $HOME/github_action.pem -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
       #       cd /var/www
 
-      #       if [ ! -d ${{env.DIRECTORY_NAME}} ]; then
-      #         mkdir ${{env.DIRECTORY_NAME}}
+      #       if [ ! -d ${{env.BUILD_DIR}} ]; then
+      #         mkdir ${{env.BUILD_DIR}}
       #       fi
 
-      #       tar xvf build.tar -C ${{ env.DIRECTORY_NAME }} --strip-component=1
+      #       tar xvf build.tar -C ${{ env.BUILD_DIR }} --strip-component=1
 
-      #       ls ${{ env.DIRECTORY_NAME }}
+      #       ls ${{ env.BUILD_DIR }}
 
       #       rm build.tar
       #     '
