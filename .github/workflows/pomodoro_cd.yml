@@ -1,4 +1,4 @@
-name: AWS EC2 connection test
+name: pomodoro - build & deploy to AWS EC2
 env:
   ARTIFACT_NAME: build_artifact
   ARTIFACT_FILE_PATH: build.tar
@@ -55,6 +55,9 @@ jobs:
       TMP_DIR: tmp
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Get public ip4
         id: ip4
         run: |
@@ -83,47 +86,48 @@ jobs:
 
           tar tf ${{ steps.get_artifact.outputs.download-path }}/${{ env.ARTIFACT_FILE_PATH }}
 
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-      #     aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-      #     aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      # - name: Add Github Actions IP to Security group
-      #   env:
-      #     IP: ${{ steps.ip4.outputs.ip4 }}
-      #   run: |
-      #     aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+      - name: Add Github Actions IP to Security group
+        env:
+          IP: ${{ steps.ip4.outputs.ip4 }}
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
 
-      # - name: Upload build files to EC2
-      #   env:
-      #     SSH_USER: ${{ secrets.AWS_EC2_USER }}
-      #     SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
-      #   run: scp -i $HOME/${{ env.KEY_FILE }} -o StrictHostKeyChecking=no tmp/build.tar ${SSH_USER}@${SSH_HOSTNAME}:/var/www
+      - name: Upload build files to EC2
+        env:
+          SSH_USER: ${{ secrets.AWS_EC2_USER }}
+          SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
+          SCP_TARGET_PATH: ${{ steps.get_artifact.outputs.download-path }}/${{ env.ARTIFACT_FILE_PATH }}
+        run: scp -i $HOME/${{ env.KEY_FILE }} -o StrictHostKeyChecking=no ${{ env.SCP_TARGET_PATH }} ${SSH_USER}@${SSH_HOSTNAME}:${{ env.TARGET_DIR }}
 
-      # - name: Connect to EC2 by SSH
-      #   env:
-      #     SSH_USER: ${{ secrets.AWS_EC2_USER }}
-      #     SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
-      #   run: |
-      #     ssh -i $HOME/github_action.pem -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
-      #       cd /var/www
+      - name: Connect to EC2 by SSH
+        env:
+          SSH_USER: ${{ secrets.AWS_EC2_USER }}
+          SSH_HOSTNAME: ${{ secrets.AWS_EC2_HOST }}
+        run: |
+          ssh -i $HOME/${{ env.KEY_FILE }} -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOSTNAME} '
+            cd ${{ env.TARGET_DIR }}
 
-      #       if [ ! -d ${{env.BUILD_DIR}} ]; then
-      #         mkdir ${{env.BUILD_DIR}}
-      #       fi
+            if [ ! -d ${{ env.BUILD_DIR }} ]; then
+              mkdir ${{ env.BUILD_DIR }}
+            fi
 
-      #       tar xvf build.tar -C ${{ env.BUILD_DIR }} --strip-component=1
+            tar xvf ${{ env.ARTIFACT_FILE_PATH }} -C ${{ env.BUILD_DIR }} --strip-component=1
 
-      #       ls ${{ env.BUILD_DIR }}
+            ls ${{ env.BUILD_DIR }}
 
-      #       rm build.tar
-      #     '
+            rm ${{ env.ARTIFACT_FILE_PATH }}
+          '
 
-      # - name: Remove Github Actions IP From Security Group
-      #   if: always()
-      #   env:
-      #     IP: ${{ steps.ip4.outputs.ip4 }}
-      #   run: |
-      #     aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
+      - name: Remove Github Actions IP From Security Group
+        if: always()
+        env:
+          IP: ${{ steps.ip4.outputs.ip4 }}
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SECURITY_GROUP }} --protocol tcp --port 22 --cidr ${IP}/32
