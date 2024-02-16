@@ -29,16 +29,15 @@ jobs:
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
           pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:"
 
-      - name: Restore flutter pub's cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ${{ steps.flutter-action.outputs.PUB-CACHE-PATH }}
-          key: ${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}
+      - name: Check pubs cache
+        run: |
+          echo PUB-CACHE-KEY=${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}
+          echo "is null? : ${{ steps.flutter-action.outputs.PUB-CACHE-KEY == null }}"
+          echo "is empty string? : ${{ steps.flutter-action.outputs.PUB-CACHE-KEY == '' }}"
 
-      - if: ${{ (steps.flutter-action.outputs.PUB-CACHE-KEY != null) || (steps.flutter-action.outputs.PUB-CACHE-KEY != '') }}
-        name: Install flutter pubs
-        run: flutter pub get
+      # - if: ${{ (steps.flutter-action.outputs.PUB-CACHE-KEY != null) || (steps.flutter-action.outputs.PUB-CACHE-KEY != '') }}
+      #   name: Install flutter pubs
+      #   run: flutter pub get
 
       - name: Build web application
         run: flutter build web
