@@ -33,7 +33,7 @@ jobs:
           pub-cache-key: "flutter-pub:os:-:channel:-:version:-:arch:-:hash:"
 
       - name: Build web application
-        run: flutter build web
+        run: flutter build web --web-renderer html
 
       - name: Tar build files
         run: tar cf ${{ env.ARTIFACT_FILE_PATH }} build/web
