@@ -10,7 +10,7 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  List routes = ['/', '/users'];
+  List routes = ['/', '/users', '/bluetooth'];
   int _index = 0;
 
   void _onItemTapped(int index) {
@@ -43,6 +43,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'users',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bluetooth),
+          label: 'bluetooth',
         ),
       ],
       currentIndex: _index,

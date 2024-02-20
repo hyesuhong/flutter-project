@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app_routes.dart';
+import 'package:flutter_application_1/screens/blue.dart';
 import 'package:flutter_application_1/screens/home.dart' show HomePage;
 import 'package:flutter_application_1/screens/users.dart' show UsersPage;
 
@@ -10,6 +11,8 @@ class RouteGenerator {
         return buildRoute(const HomePage(), settings: settings);
       case AppRoutes.users:
         return buildRoute(const UsersPage(), settings: settings);
+      case AppRoutes.bluetooth:
+        return buildRoute(const BluetoothPage(), settings: settings);
       default:
         return _errorRoute();
     }
